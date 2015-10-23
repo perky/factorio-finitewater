@@ -10,7 +10,6 @@ local WATER_BODY_TOO_BIG = -1
 local SEARCH_INTERVAL = 10
 local WATER_PER_TILE = 25
 local SEDIMENT = {"stone", "stone", "stone", "stone-rock"}
-local pumps = {}
 local _pumpWater, _findWaterTiles
 
 function WaterDrain.OnInit()
@@ -20,20 +19,13 @@ end
 function WaterDrain.OnLoad()
 	if not water_drain_has_init then
 		water_drain_has_init = true
-		if global.water_drain then
-			pumps = global.water_drain.pumps
-			for index, pump in ipairs(pumps) do
-				pump.routine = coroutine.create(_pumpWater)
-			end
+		if not global.water_drain then
+                   global.water_drain = {}
+                end
+                for index, pump in ipairs(global.water_drain.pumps) do
+                   pump.routine = coroutine.create(_pumpWater)
 		end
 	end
-end
-
-function WaterDrain.OnSave()
-	if not global.water_drain then
-		global.water_drain = {}
-	end
-	global.water_drain.pumps = pumps
 end
 
 function WaterDrain.AddWaterDrainingPump( pumpEntity )
@@ -44,20 +36,20 @@ function WaterDrain.AddWaterDrainingPump( pumpEntity )
 		deltaWater = 0,
 		lastWaterAmount
 	}
-	table.insert(pumps, pump)
+	table.insert(global.water_drain.pumps, pump)
 end
 
 function WaterDrain.RemoveWaterDrainingPump( pumpEntity )
-	for index, pump in ipairs(pumps) do
+	for index, pump in ipairs(global.water_drain.pumps) do
 		if pump == pumpEntity then
-			table.remove(pumps, index)
+			table.remove(global.water_drain.pumps, index)
 			break
 		end
 	end
 end
 
 function WaterDrain.OnTick()
-	for _, pump in ipairs(pumps) do
+	for _, pump in ipairs(global.water_drain.pumps) do
 		if pump.routine and pump.entity and pump.entity.valid then
 			if not SafeResumeCoroutine(pump.routine, pump) then
 				pump.routine = nil
@@ -69,10 +61,10 @@ function WaterDrain.OnTick()
 
 	-- Clean up the pumps array.
 	if ModuloTimer(1*MINUTES) then
-		for i = #pumps, 1, -1 do
-			local pump = pumps[i]
+		for i = #global.water_drain.pumps, 1, -1 do
+			local pump = global.water_drain.pumps[i]
 			if not pump.routine then
-				table.remove(pumps, i)
+				table.remove(global.water_drain.pumps, i)
 			end
 		end
 	end
