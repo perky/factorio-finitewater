@@ -13,6 +13,9 @@ local SEDIMENT = {"stone", "stone", "stone", "stone-rock"}
 local _pumpWater, _findWaterTiles
 
 function WaterDrain.OnInit()
+	if not global.water_drain then
+	   global.water_drain = { pumps = {} }
+	end
 	water_drain_has_init = true
 end
 
@@ -20,7 +23,7 @@ function WaterDrain.OnLoad()
 	if not water_drain_has_init then
 		water_drain_has_init = true
 		if not global.water_drain then
-                   global.water_drain = {}
+                   global.water_drain = { pumps = {} }
                 end
                 for index, pump in ipairs(global.water_drain.pumps) do
                    pump.routine = coroutine.create(_pumpWater)
