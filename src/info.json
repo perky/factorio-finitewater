@@ -1,0 +1,10 @@
+{
+  "name": "finitewater",
+  "version": "1.0.2",
+  "title": "Finite Water",
+  "author": "Luke Perkin",
+  "contact": "",
+  "www": "www.locogame.co.uk",
+  "description": "Offshore pumps slowly drain lakes until they are removed entirely.",
+  "dependencies": ["base >= 0.12.11"]
+}
